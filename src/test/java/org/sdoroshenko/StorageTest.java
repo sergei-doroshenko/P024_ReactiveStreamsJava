@@ -4,12 +4,12 @@ import org.testng.annotations.Test;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadFactory;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
@@ -102,6 +102,12 @@ public class StorageTest {
     public void scheduled() {
         ExecutorService poolA = newFixedThreadPool(10);
         Scheduler schedulerA = Schedulers.from(poolA);
+        schedulerA.createWorker().schedule(new Action0() {
+            @Override
+            public void call() {
+                System.out.println("Scheduler");
+            }
+        });
 
         Observable.from(Arrays.asList("one", "two", "three"))
                 .take(2)
