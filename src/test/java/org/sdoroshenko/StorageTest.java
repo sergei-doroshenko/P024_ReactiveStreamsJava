@@ -10,7 +10,10 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
@@ -96,7 +99,33 @@ public class StorageTest {
         // and merges into a third sequential stream
         Observable<String> c = Observable.merge(a, b);
 
-        c.subscribe(hello -> System.out.println(hello));
+        c.subscribe(hello -> log(hello));
+    }
+
+    @Test
+    public void async2() throws InterruptedException {
+
+        final List<String> wrapper = new CopyOnWriteArrayList<>();
+
+        Observable<String> a = Observable.fromCallable(() -> executeExternal(wrapper, "test"))
+                .observeOn(Schedulers.newThread());
+
+        a.subscribe(result -> handle(result));
+
+        pause(2);
+    }
+
+    public void handle(String result) {
+        log(result);
+    }
+
+    public String executeExternal(List<String> list, String item) {
+        list.add(item);
+        return "Success";
+    }
+
+    public String probableFromDB() {
+        return Arrays.asList("one", "two", "three").get(1);
     }
 
     @Test
@@ -121,4 +150,16 @@ public class StorageTest {
     /*private ThreadFactory threadFactory(String pattern) {
         return new ThreadFactoryBuilder().setNameFormat(pattern).build();
     }*/
+
+    private void log(String message) {
+        System.out.println('[' + Thread.currentThread().getName() + "]: " + message);
+    }
+
+    private void pause(int timeout) {
+        try {
+            TimeUnit.SECONDS.sleep(timeout);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
