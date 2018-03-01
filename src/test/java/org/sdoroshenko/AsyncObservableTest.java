@@ -6,7 +6,9 @@ import rx.Observable;
 import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+
+import static org.sdoroshenko.Util.log;
+import static org.sdoroshenko.Util.pause;
 
 /**
  * Created by Sergei_Admin on 17.02.2018.
@@ -51,21 +53,5 @@ public class AsyncObservableTest {
             });
         });
         return observable;
-    }
-
-    private void pause(int timeout) {
-        try {
-            TimeUnit.SECONDS.sleep(timeout);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void log(String message) {
-        System.out.println(
-                Thread.currentThread().getName() + " : " +
-                System.currentTimeMillis() + " : " +
-                        message
-        );
     }
 }
