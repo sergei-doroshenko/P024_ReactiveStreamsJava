@@ -4,9 +4,7 @@ import rx.Emitter;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.util.concurrent.TimeUnit;
-
-public class Sample {
+public class AsyncPublisher {
 
     public static void main(String[] args) {
         Observable.<Integer>create(emitter -> emit(emitter), Emitter.BackpressureMode.DROP)
@@ -14,7 +12,7 @@ public class Sample {
 //            .debounce(600, TimeUnit.MILLISECONDS)
             .map(data -> data * 1)
             .subscribe(
-                Sample::process,
+                AsyncPublisher::process,
                 err -> System.out.println("ERROR: " + err),
                 () -> System.out.println("DONE"));
         sleep(10000);

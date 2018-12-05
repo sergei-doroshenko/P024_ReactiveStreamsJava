@@ -4,10 +4,11 @@ import rx.Observable;
 
 import java.util.concurrent.TimeUnit;
 
-public class Sample2 {
+public class SeveralSubscribers {
 
     public static void main(String[] args) {
-        Observable<Long> feed = Observable.interval(1, 1, TimeUnit.SECONDS);
+        Observable<Long> feed = Observable.interval(1, 1, TimeUnit.SECONDS)
+            .share();
 
         feed.subscribe(data -> process("S1: " + data));
         sleep(5000);
