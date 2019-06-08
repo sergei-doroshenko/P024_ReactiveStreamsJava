@@ -1,10 +1,9 @@
 package org.sdoroshenko;
 
-import org.junit.Ignore;
-import org.junit.Test;
 import org.postgresql.PGNotification;
 import org.postgresql.jdbc2.AbstractJdbc2Connection;
 import org.postgresql.jdbc42.Jdbc42Connection;
+import org.testng.annotations.Test;
 import rx.Observable;
 import rx.observers.Subscribers;
 import rx.subscriptions.Subscriptions;
@@ -13,10 +12,9 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-@Ignore
 public class Postgres {
 
-    @Test
+    @Test(enabled = false)
     public void sample_37() throws Exception {
         try (
                 Connection conn = DriverManager.getConnection("jdbc:h2:mem:");
@@ -30,7 +28,7 @@ public class Postgres {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void sample_55() throws Exception {
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql:db")) {
             try (Statement statement = connection.createStatement()) {
