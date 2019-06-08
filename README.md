@@ -1,2 +1,2 @@
-# P024_RxJava
+# Reactive Streams on Java
 RxJava test project
