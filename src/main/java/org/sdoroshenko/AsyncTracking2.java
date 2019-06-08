@@ -1,7 +1,6 @@
 package org.sdoroshenko;
 
 import rx.Observer;
-import rx.functions.Action1;
 import rx.observables.SyncOnSubscribe;
 import rx.schedulers.Schedulers;
 
@@ -19,13 +18,10 @@ public class AsyncTracking2 {
         rx.Observable.create(new Sub(0, 10, result))
                 .subscribeOn(Schedulers.io())
                 // if we remove subscriber the emitter doesn't emit values
-                /*.subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        System.out.println("\tInside async call in Thread: " + Thread.currentThread().getName());
-                        System.out.println("\t\tGet: " + s);
-                    }
-                })*/;
+                .subscribe(streamValue -> {
+                    System.out.println("\tInside async call in Thread: " + Thread.currentThread().getName());
+                    System.out.println("\t\tGet: " + streamValue);
+                });
         System.out.println("After async call in Thread: " + Thread.currentThread().getName());
         TimeUnit.SECONDS.sleep(1);
         System.out.println(result);
