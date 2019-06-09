@@ -10,6 +10,7 @@
     <version>SNAPSHOT-1.0</version>
     <modules>
         <module>rx-java</module>
+        <module>rx-java-2</module>
     </modules>
 
     <properties>
