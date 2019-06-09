@@ -7,11 +7,7 @@ import rx.functions.Action0;
 import rx.functions.Func0;
 import rx.internal.schedulers.ScheduledAction;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static org.sdoroshenko.Util.log;
 
