@@ -5,50 +5,58 @@ import rx.schedulers.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * In this sample we fetch messages from repository, send notification for each message and remove it from DB.
+ */
 public class CombineZipSample {
 
-    public static void main(String[] args) throws InterruptedException {
-        CountDownLatch executionLatch = new CountDownLatch(3);
-
+    public static void main(String[] args) {
         MessagesRepo repo = new MessagesRepo();
         Notifier notifier = new Notifier();
 
         List<Message> messages = repo.getMessages();
-        List<Observable<Long>> observables = new ArrayList<>(messages.size());
+        List<Observable<Map<Long, Boolean>>> observables = new ArrayList<>(messages.size());
 
         for (Message message : messages) {
-            Observable<Boolean> result = notifier.notify(message);
-            result.subscribe(resp -> {
-                System.out.println("Notification result:" + resp);
-                observables.add(Observable.just(message.getId()));
-                executionLatch.countDown();
-            });
+            observables.add(notifier.notify(message).flatMap(r -> {
+                Map<Long, Boolean> m = new HashMap<>(1);
+                m.put(message.getId(), r);
+                return Observable.just(m);
+            }));
         }
-
-        executionLatch.await();
 
         Observable.zip(
             observables,
             responses -> Observable.from(responses)
-                .cast(Long.class)
+                .cast(Map.class)
+                .map(m -> {
+                    Set<Map.Entry<Long, Boolean>> set = m.entrySet();
+                    return set.iterator().next();
+                })
+                .filter(entry -> entry.getValue())
+                .map(entry -> entry.getKey())
                 .toList()
                 .subscribe(ids -> {
+                    System.out.println(ids.getClass());
+                    System.out.println(ids.get(0).getClass());
                     System.out.println("Removing Action from DB: " + ids);
                     repo.deleteByIds(ids);
                 })
         ).toBlocking().single();
     }
 
-    public static class MessagesRepo {
+    static class MessagesRepo {
 
         List<Message> getMessages() {
             return Arrays.asList(new Message(1L), new Message(2L), new Message(3L));
         }
 
-        public void deleteByIds(List<Long> ids) {
+        void deleteByIds(List<Long> ids) {
             System.out.println("Repo removing from DB: " + ids);
         }
     }
@@ -56,21 +64,21 @@ public class CombineZipSample {
     /**
      * Sends async notification.
      */
-    public static class Notifier {
-        Observable<Boolean> notify (Message message) {
+    static class Notifier {
+        Observable<Boolean> notify(Message message) {
             System.out.println("Send message: " + message.getId());
             return Observable.just(true).observeOn(Schedulers.newThread());
         }
     }
 
-    public static class Message {
+    static class Message {
         private final Long id;
 
-        public Message(Long id) {
+        Message(Long id) {
             this.id = id;
         }
 
-        public Long getId() {
+        Long getId() {
             return id;
         }
     }
