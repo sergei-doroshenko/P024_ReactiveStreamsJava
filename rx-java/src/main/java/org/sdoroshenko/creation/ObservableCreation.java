@@ -2,6 +2,7 @@ package org.sdoroshenko.creation;
 
 import rx.Emitter;
 import rx.Observable;
+import rx.Subscriber;
 import rx.functions.Action1;
 
 public class ObservableCreation {
@@ -23,6 +24,27 @@ public class ObservableCreation {
 
             emitter.onCompleted();
 
+        }
+    }
+
+    private static class MyOnSubscribe implements Observable.OnSubscribe<Integer> {
+
+        private int counter;
+
+        private MyOnSubscribe(int counter) {
+            this.counter = counter;
+        }
+
+        @Override
+        public void call(Subscriber<? super Integer> subscriber) {
+            if (counter > 2) {
+                subscriber.onError(new RuntimeException("Test"));
+            } else if (counter == 3) {
+                subscriber.onCompleted();
+            } else {
+                subscriber.onNext(counter);
+            }
+            counter++;
         }
     }
 }
